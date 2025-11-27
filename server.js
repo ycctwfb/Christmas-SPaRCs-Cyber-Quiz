@@ -18,7 +18,22 @@ const state = {
   questionLocked: false
 };
 
-function broadcastState() {
+function safeSend(client, data) {
+  if (client.readyState !== WebSocket.OPEN) return;
+
+  try {
+    client.send(data);
+  } catch (error) {
+    console.warn('Dropping a WebSocket client after send failure:', error.message);
+    try {
+      client.terminate();
+    } catch (_) {
+      // ignore terminate errors
+    }
+  }
+}
+
+function buildStatePayload() {
   const payload = {
     ...state,
     totalQuestions: questions.length,
@@ -30,25 +45,19 @@ function broadcastState() {
       : ''
   };
 
+  return JSON.stringify({ type: 'state', payload });
+}
+
+function broadcastState() {
+  const payload = buildStatePayload();
+
   wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'state', payload }));
-    }
+    safeSend(client, payload);
   });
 }
 
 function sendState(ws) {
-  const payload = {
-    ...state,
-    totalQuestions: questions.length,
-    correctAnswer: state.questionLocked && state.phase === 'question'
-      ? questions[state.currentQuestion].correct
-      : null,
-    explanation: state.questionLocked && state.phase === 'question'
-      ? questions[state.currentQuestion].explanation
-      : ''
-  };
-  ws.send(JSON.stringify({ type: 'state', payload }));
+  safeSend(ws, buildStatePayload());
 }
 
 function scoreAnswers() {
@@ -71,6 +80,11 @@ function lockQuestionIfNeeded() {
 }
 
 wss.on('connection', (ws) => {
+  ws.isAlive = true;
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
+
   sendState(ws);
 
   ws.on('message', (data) => {
@@ -82,6 +96,23 @@ wss.on('connection', (ws) => {
     }
   });
 });
+
+const heartbeat = setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      ws.terminate();
+      return;
+    }
+
+    ws.isAlive = false;
+    try {
+      ws.ping();
+    } catch (error) {
+      console.warn('Failed to ping client, terminating:', error.message);
+      ws.terminate();
+    }
+  });
+}, 30000);
 
 function handleMessage(message) {
   const { type, payload } = message;
@@ -132,4 +163,8 @@ function handleMessage(message) {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Quiz running at http://localhost:${PORT}`);
+});
+
+server.on('close', () => {
+  clearInterval(heartbeat);
 });
