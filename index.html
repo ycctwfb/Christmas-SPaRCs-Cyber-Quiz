@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Christmas Cyber Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content">
+      <p class="eyebrow">Festive Security Showdown</p>
+      <h1>Christmas SPaRCs Cyber Quiz</h1>
+      <p class="lede">Add your teams, race through the questions, and see which crew ends up on the nice list podium.</p>
+    </div>
+    <div class="hero__badge">
+      <span class="badge__icon">🎄</span>
+      <div>
+        <p class="badge__title">Team Meeting Edition</p>
+        <p class="badge__meta">Live answers · Instant explanations · Automatic podium</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="team-section">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2>Name your teams</h2>
+        </div>
+        <span class="snowy-divider" aria-hidden="true">❄️❄️❄️</span>
+      </div>
+      <form id="team-form" class="team-form">
+        <label for="team-name" class="sr-only">Team name</label>
+        <input id="team-name" type="text" placeholder="e.g., Frosty Firewalls" autocomplete="off" required />
+        <button type="submit">Add team</button>
+      </form>
+      <div id="team-list" class="pill-row" aria-live="polite"></div>
+      <div class="start-row">
+        <button id="start-btn" class="primary" disabled>Start the quiz</button>
+        <p class="hint">Tip: add multiple teams so everyone can play. Answers stay hidden until every team responds.</p>
+      </div>
+    </section>
+
+    <section class="card hidden" id="quiz-section">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow">Step 2</p>
+          <h2 id="question-title">Question</h2>
+        </div>
+        <div class="progress" aria-live="polite">
+          <span id="progress-count">0 / 0</span>
+          <span class="progress__bar"><span id="progress-bar-fill"></span></span>
+        </div>
+      </div>
+
+      <div id="question-text" class="question"></div>
+
+      <div class="options" id="options-list"></div>
+
+      <div class="teams-answers" id="teams-answers" aria-live="polite"></div>
+
+      <div id="explanation" class="explanation hidden" aria-live="polite"></div>
+
+      <div class="nav-row">
+        <button id="next-btn" class="primary" disabled>Next question</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="winners-section">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow">Finale</p>
+          <h2>Nice List Podium</h2>
+        </div>
+        <span class="snowy-divider" aria-hidden="true">⭐️⭐️⭐️</span>
+      </div>
+      <p class="lede">Celebrate your cyber champions! First, second, and third place are crowned automatically.</p>
+      <div id="podium" class="podium"></div>
+      <div class="scoreboard" id="scoreboard"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built for a cozy team meeting — keep your sleigh secure and your spirits bright.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
