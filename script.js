@@ -1,90 +1,6 @@
-const questions = [
-  {
-    text: "Santa’s email account gets hacked because he used “Santa123” as his password. What is the main issue here?",
-    options: [
-      "Password is too festive",
-      "Password is too short",
-      "Password is weak and predictable",
-      "Password is not encrypted"
-    ],
-    correct: 2,
-    explanation:
-      "Using simple, predictable passwords like “Santa123” makes accounts easy to hack. Strong passwords should be complex and unique."
-  },
-  {
-    text: "Santa receives an email saying “Click here to claim your free sleigh upgrade!” What type of cyber attack is this?",
-    options: ["Malware", "Phishing", "Ransomware", "Spoofing"],
-    correct: 1,
-    explanation:
-      "Phishing emails trick users into clicking malicious links or providing sensitive information by pretending to be legitimate offers."
-  },
-  {
-    text: "The elves use public Wi-Fi at the North Pole café to check toy orders. What is the biggest risk?",
-    options: ["Slow internet", "Data interception", "Battery drain", "Toy list corruption"],
-    correct: 1,
-    explanation:
-      "Public Wi-Fi is often unsecured, making it easy for attackers to intercept sensitive data like login credentials."
-  },
-  {
-    text: "Santa stores all naughty/nice lists on a USB stick without encryption. What is the risk?",
-    options: [
-      "USB might freeze",
-      "Data loss due to malware",
-      "Unauthorized access if lost",
-      "Slower toy delivery"
-    ],
-    correct: 2,
-    explanation:
-      "Unencrypted USB drives can expose sensitive data if lost or stolen. Encryption protects data even if the device is compromised."
-  },
-  {
-    text: "An elf installs a free “Christmas Countdown” app that secretly steals data. What type of threat is this?",
-    options: ["Worm", "Trojan Horse", "Spyware", "Rootkit"],
-    correct: 1,
-    explanation:
-      "A Trojan Horse disguises itself as a legitimate app but contains malicious code that steals or damages data."
-  },
-  {
-    text: "Santa wants to share toy blueprints securely with elves. Which method is best?",
-    options: [
-      "Email without attachment",
-      "Encrypted file transfer",
-      "Posting on social media",
-      "Sending via SMS"
-    ],
-    correct: 1,
-    explanation:
-      "Encrypted file transfer ensures that only authorized recipients can access the sensitive data."
-  },
-  {
-    text: "Santa’s workshop network gets locked and demands payment in Bitcoin. What attack is this?",
-    options: ["Phishing", "Ransomware", "DDoS", "Keylogging"],
-    correct: 1,
-    explanation:
-      "Ransomware encrypts files and demands payment for decryption, often in cryptocurrency."
-  },
-  {
-    text: "An elf notices strange activity on Santa’s account after clicking a link. What should they do first?",
-    options: ["Ignore it", "Change the password", "Delete the account", "Post about it online"],
-    correct: 1,
-    explanation:
-      "Changing the password immediately helps prevent further unauthorized access and limits damage."
-  },
-  {
-    text: "Santa uses the same password for his email and toy inventory system. What is this called?",
-    options: ["Password recycling", "Password hashing", "Password encryption", "Password rotation"],
-    correct: 0,
-    explanation:
-      "Reusing passwords across multiple accounts increases risk—if one account is compromised, others are too."
-  },
-  {
-    text: "Santa wants to ensure his sleigh’s GPS system is safe from hackers. What should he implement?",
-    options: ["Strong encryption", "Festive firewall", "Christmas antivirus", "Toy tracker"],
-    correct: 0,
-    explanation:
-      "Encrypting GPS data prevents attackers from intercepting or altering navigation information."
-  }
-];
+import './questions.js';
+
+const questions = window.questions || [];
 
 const teamForm = document.getElementById("team-form");
 const teamNameInput = document.getElementById("team-name");
@@ -105,47 +21,91 @@ const progressBarFill = document.getElementById("progress-bar-fill");
 const podium = document.getElementById("podium");
 const scoreboard = document.getElementById("scoreboard");
 
-let teams = [];
-let currentQuestion = 0;
-let answers = {};
-let questionLocked = false;
-
 const letters = ["A", "B", "C", "D"];
+const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+const socket = new WebSocket(`${protocol}://${window.location.host}`);
+
+let quizState = {
+  teams: [],
+  currentQuestion: 0,
+  answers: {},
+  phase: "setup",
+  questionLocked: false,
+  correctAnswer: null,
+  explanation: ""
+};
+
+socket.addEventListener("open", () => {
+  startBtn.disabled = quizState.teams.length === 0;
+});
+
+socket.addEventListener("message", (event) => {
+  const message = JSON.parse(event.data);
+  if (message.type === "state") {
+    quizState = message.payload;
+    renderFromState();
+  }
+});
+
+socket.addEventListener("close", () => {
+  startBtn.disabled = true;
+  nextBtn.disabled = true;
+});
 
 teamForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const name = teamNameInput.value.trim();
   if (!name) return;
-  addTeam(name);
+  send({ type: "add-team", payload: { name } });
   teamNameInput.value = "";
 });
 
 startBtn.addEventListener("click", () => {
-  teamSection.classList.add("hidden");
-  quizSection.classList.remove("hidden");
-  renderQuestion();
+  send({ type: "start-quiz" });
 });
 
 nextBtn.addEventListener("click", () => {
-  if (currentQuestion < questions.length - 1) {
-    currentQuestion += 1;
-    resetQuestionState();
-    renderQuestion();
-  } else {
-    showWinners();
-  }
+  send({ type: "next-question" });
 });
 
-function addTeam(name) {
-  if (teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) return;
-  teams.push({ name, score: 0 });
+function send(message) {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(message));
+  }
+}
+
+function renderFromState() {
   renderTeams();
-  startBtn.disabled = teams.length === 0;
+  progressCount.textContent = `${Math.min(quizState.currentQuestion + 1, questions.length)} / ${questions.length}`;
+  progressBarFill.style.width = `${Math.min(((quizState.currentQuestion + 1) / questions.length) * 100, 100)}%`;
+
+  if (quizState.phase === "setup") {
+    teamSection.classList.remove("hidden");
+    quizSection.classList.add("hidden");
+    winnersSection.classList.add("hidden");
+    startBtn.disabled = quizState.teams.length === 0 || socket.readyState !== WebSocket.OPEN;
+    return;
+  }
+
+  if (quizState.phase === "question") {
+    teamSection.classList.add("hidden");
+    winnersSection.classList.add("hidden");
+    quizSection.classList.remove("hidden");
+    renderQuestion();
+    return;
+  }
+
+  if (quizState.phase === "final") {
+    teamSection.classList.add("hidden");
+    quizSection.classList.add("hidden");
+    winnersSection.classList.remove("hidden");
+    showWinners();
+  }
 }
 
 function renderTeams() {
   teamList.innerHTML = "";
-  teams.forEach((team) => {
+  quizState.teams.forEach((team) => {
     const pill = document.createElement("div");
     pill.className = "pill";
     pill.textContent = team.name;
@@ -153,21 +113,9 @@ function renderTeams() {
   });
 }
 
-function resetQuestionState() {
-  answers = {};
-  questionLocked = false;
-  nextBtn.disabled = true;
-  explanationBox.classList.add("hidden");
-  explanationBox.textContent = "";
-}
-
 function renderQuestion() {
-  const { text, options, correct } = questions[currentQuestion];
-  progressCount.textContent = `${currentQuestion + 1} / ${questions.length}`;
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-  progressBarFill.style.width = `${progress}%`;
-
-  questionTitle.textContent = `Question ${currentQuestion + 1}`;
+  const { text, options, correct, explanation } = questions[quizState.currentQuestion];
+  questionTitle.textContent = `Question ${quizState.currentQuestion + 1}`;
   questionText.textContent = text;
 
   optionsList.innerHTML = "";
@@ -175,16 +123,22 @@ function renderQuestion() {
     const optionEl = document.createElement("div");
     optionEl.className = "option";
     optionEl.innerHTML = `<span class="option__label">${letters[idx]}</span><span>${opt}</span>`;
-    if (questionLocked && idx === correct) optionEl.classList.add("correct");
+    if (quizState.questionLocked && idx === correct) optionEl.classList.add("correct");
     optionsList.appendChild(optionEl);
   });
 
-  renderTeamAnswerPanels();
+  renderTeamAnswerPanels(correct, explanation);
+  const isLast = quizState.currentQuestion === questions.length - 1;
+  nextBtn.textContent = isLast ? "See the podium" : "Next question";
+  nextBtn.disabled = !quizState.questionLocked;
+
+  explanationBox.textContent = explanation;
+  explanationBox.classList.toggle("hidden", !quizState.questionLocked);
 }
 
-function renderTeamAnswerPanels() {
+function renderTeamAnswerPanels(correct, explanation) {
   teamsAnswers.innerHTML = "";
-  teams.forEach((team) => {
+  quizState.teams.forEach((team) => {
     const wrapper = document.createElement("div");
     wrapper.className = "team-answer";
 
@@ -203,21 +157,37 @@ function renderTeamAnswerPanels() {
     const controls = document.createElement("div");
     controls.className = "team-controls";
 
-    questions[currentQuestion].options.forEach((opt, idx) => {
+    questions[quizState.currentQuestion].options.forEach((opt, idx) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "option-btn";
       btn.dataset.team = team.name;
       btn.dataset.choice = idx;
+      btn.disabled = quizState.questionLocked;
       btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt}</span><span class="ghost">🦌</span>`;
       btn.addEventListener("click", handleTeamChoice);
 
-      if (answers[team.name] === idx) {
+      if (quizState.answers[team.name] === idx) {
         btn.classList.add("selected");
+      }
+
+      if (quizState.questionLocked) {
+        const chosen = quizState.answers[team.name];
+        btn.classList.toggle("correct", idx === correct);
+        btn.classList.toggle("incorrect", idx === chosen && chosen !== correct);
       }
 
       controls.appendChild(btn);
     });
+
+    const chosen = quizState.answers[team.name];
+    if (quizState.questionLocked && typeof chosen === "number") {
+      chip.textContent = chosen === correct ? "Correct" : "Nice try";
+      chip.className = `status-chip ${chosen === correct ? "correct" : "wrong"}`;
+    } else if (typeof chosen === "number") {
+      chip.textContent = "Locked in";
+      chip.className = "status-chip ready";
+    }
 
     wrapper.appendChild(controls);
     teamsAnswers.appendChild(wrapper);
@@ -225,71 +195,13 @@ function renderTeamAnswerPanels() {
 }
 
 function handleTeamChoice(event) {
-  if (questionLocked) return;
   const teamName = event.currentTarget.dataset.team;
   const choice = Number(event.currentTarget.dataset.choice);
-  answers[teamName] = choice;
-  updateSelections();
-  if (Object.keys(answers).length === teams.length) {
-    revealExplanation();
-  }
-}
-
-function updateSelections() {
-  document.querySelectorAll(".team-controls").forEach((group) => {
-    group.querySelectorAll(".option-btn").forEach((btn) => {
-      const teamName = btn.dataset.team;
-      const selected = answers[teamName];
-      btn.classList.toggle("selected", Number(btn.dataset.choice) === selected);
-    });
-  });
-}
-
-function revealExplanation() {
-  questionLocked = true;
-  const { correct, explanation } = questions[currentQuestion];
-
-  document.querySelectorAll(".team-answer").forEach((card) => {
-    const teamName = card.querySelector(".team-answer__header span:last-child").textContent;
-    const chosen = answers[teamName];
-    const statusChip = card.querySelector(".status-chip");
-
-    card.querySelectorAll(".option-btn").forEach((btn) => {
-      const choice = Number(btn.dataset.choice);
-      btn.classList.toggle("correct", choice === correct);
-      btn.classList.toggle("incorrect", choice === chosen && chosen !== correct);
-    });
-
-    if (chosen === correct) {
-      statusChip.textContent = "Correct";
-      statusChip.className = "status-chip correct";
-      incrementScore(teamName);
-    } else {
-      statusChip.textContent = "Nice try";
-      statusChip.className = "status-chip wrong";
-    }
-  });
-
-  document.querySelectorAll(".option").forEach((opt, idx) => {
-    opt.classList.toggle("correct", idx === correct);
-  });
-
-  explanationBox.textContent = explanation;
-  explanationBox.classList.remove("hidden");
-  nextBtn.textContent = currentQuestion === questions.length - 1 ? "See the podium" : "Next question";
-  nextBtn.disabled = false;
-}
-
-function incrementScore(teamName) {
-  const team = teams.find((t) => t.name === teamName);
-  if (team) team.score += 1;
+  send({ type: "answer", payload: { teamName, choice } });
 }
 
 function showWinners() {
-  quizSection.classList.add("hidden");
-  winnersSection.classList.remove("hidden");
-
-  const standings = [...teams].sort((a, b) => b.score - a.score);
+  const standings = [...quizState.teams].sort((a, b) => b.score - a.score);
   const medals = ["🥇", "🥈", "🥉"];
 
   podium.innerHTML = "";
