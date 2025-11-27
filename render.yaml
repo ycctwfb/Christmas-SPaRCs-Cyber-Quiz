@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: christmas-sparcs-cyber-quiz
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
