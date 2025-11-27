@@ -18,6 +18,16 @@ If your office Wi‑Fi blocks device-to-device traffic, deploy the quiz to a hos
 3. Build command: `npm install` (default). Start command: `npm start`.
 4. Render sets `PORT` automatically—no code changes needed. Once live, share the Render URL (e.g., `https://your-quiz.onrender.com`) with your team.
 
+#### What to pick on the Render form
+- **Name**: Whatever helps you recognize it (e.g., `christmas-quiz`).
+- **Region**: Closest to your office so everyone gets low latency.
+- **Environment**: **Node** (not static); **Dockerfile path** stays blank because we’re not using a custom Dockerfile.
+- **Branch**: `main` (or whichever branch has your quiz changes).
+- **Instance type**: Starter (512 MB / 0.5 CPU) is plenty for small team sessions. You can also use the Free tier if it’s available on your account—the app is very light.
+- **Build command**: `npm install` (defaults from `render.yaml`).
+- **Start command**: `npm start` (defaults from `render.yaml`).
+- **Auto-deploy**: On, so content updates redeploy automatically.
+
 ### Manual deploy from a zipped copy
 1. Zip this repo and upload it as a new Render Web Service (or any Heroku/Glitch/Railway-style Node host).
 2. Use the same build/start commands above and let the host supply the `PORT` environment variable.
