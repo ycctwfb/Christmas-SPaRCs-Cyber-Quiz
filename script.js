@@ -103,7 +103,6 @@ const progressCount = document.getElementById("progress-count");
 const progressBarFill = document.getElementById("progress-bar-fill");
 const finalScore = document.getElementById("final-score");
 const finalMessage = document.getElementById("final-message");
-const rewardFlight = document.getElementById("reward-flight");
 
 let teams = [];
 let currentQuestion = 0;
@@ -248,7 +247,6 @@ function updateSelections() {
 function revealExplanation() {
   questionLocked = true;
   const { correct, explanation } = questions[currentQuestion];
-  let celebrated = false;
 
   document.querySelectorAll(".team-answer").forEach((card) => {
     const teamName = card.querySelector(".team-answer__header span:last-child").textContent;
@@ -265,7 +263,6 @@ function revealExplanation() {
       statusChip.textContent = "Correct";
       statusChip.className = "status-chip correct";
       incrementScore(teamName);
-      celebrated = true;
     } else {
       statusChip.textContent = "Nice try";
       statusChip.className = "status-chip wrong";
@@ -280,26 +277,11 @@ function revealExplanation() {
   explanationBox.classList.remove("hidden");
   nextBtn.textContent = currentQuestion === questions.length - 1 ? "See your results" : "Next question";
   nextBtn.disabled = false;
-
-  if (celebrated) {
-    triggerReindeerFlyover();
-  }
 }
 
 function incrementScore(teamName) {
   const team = teams.find((t) => t.name === teamName);
   if (team) team.score += 1;
-}
-
-function triggerReindeerFlyover() {
-  if (!rewardFlight) return;
-  rewardFlight.classList.remove("is-flying");
-  // force reflow to restart animation
-  void rewardFlight.offsetWidth;
-  rewardFlight.classList.add("is-flying");
-  setTimeout(() => {
-    rewardFlight.classList.remove("is-flying");
-  }, 4200);
 }
 
 function showWinners() {
