@@ -10,17 +10,18 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="snowfall" aria-hidden="true"></div>
+  <div class="snowfall snowfall--slow" aria-hidden="true"></div>
   <header class="hero">
     <div class="hero__content">
       <p class="eyebrow">Festive Security Showdown</p>
       <h1>Christmas SPaRCs Cyber Quiz</h1>
-      <p class="lede">Add your teams, race through the questions, and see which crew ends up on the nice list podium.</p>
+      <p class="lede">Pick your team name, race through the questions, and lock in your festive security score.</p>
     </div>
     <div class="hero__badge">
       <span class="badge__icon">🎄</span>
       <div>
         <p class="badge__title">Team Meeting Edition</p>
-        <p class="badge__meta">Live answers · Instant explanations · Automatic podium</p>
       </div>
     </div>
   </header>
@@ -30,7 +31,7 @@
       <div class="card__header">
         <div>
           <p class="eyebrow">Step 1</p>
-          <h2>Name your teams</h2>
+          <h2>Name your team</h2>
         </div>
         <span class="snowy-divider" aria-hidden="true">❄️❄️❄️</span>
       </div>
@@ -40,10 +41,6 @@
         <button type="submit">Add team</button>
       </form>
       <div id="team-list" class="pill-row" aria-live="polite"></div>
-      <div class="start-row">
-        <button id="start-btn" class="primary" disabled>Start the quiz</button>
-        <p class="hint">Tip: add multiple teams so everyone can play. Answers stay hidden until every team responds.</p>
-      </div>
     </section>
 
     <section class="card hidden" id="quiz-section">
@@ -75,18 +72,18 @@
       <div class="card__header">
         <div>
           <p class="eyebrow">Finale</p>
-          <h2>Nice List Podium</h2>
+          <h2>Festive Security Wrap-Up</h2>
         </div>
         <span class="snowy-divider" aria-hidden="true">⭐️⭐️⭐️</span>
       </div>
-      <p class="lede">Celebrate your cyber champions! First, second, and third place are crowned automatically.</p>
-      <div id="podium" class="podium"></div>
-      <div class="scoreboard" id="scoreboard"></div>
+      <div class="result-card">
+        <p class="result-score" id="final-score"></p>
+        <p class="result-message" id="final-message"></p>
+      </div>
     </section>
   </main>
 
   <footer>
-    <p>Built for a cozy team meeting — keep your sleigh secure and your spirits bright.</p>
   </footer>
 
   <script src="script.js"></script>

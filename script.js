@@ -89,7 +89,6 @@ const questions = [
 const teamForm = document.getElementById("team-form");
 const teamNameInput = document.getElementById("team-name");
 const teamList = document.getElementById("team-list");
-const startBtn = document.getElementById("start-btn");
 
 const quizSection = document.getElementById("quiz-section");
 const teamSection = document.getElementById("team-section");
@@ -102,8 +101,8 @@ const explanationBox = document.getElementById("explanation");
 const nextBtn = document.getElementById("next-btn");
 const progressCount = document.getElementById("progress-count");
 const progressBarFill = document.getElementById("progress-bar-fill");
-const podium = document.getElementById("podium");
-const scoreboard = document.getElementById("scoreboard");
+const finalScore = document.getElementById("final-score");
+const finalMessage = document.getElementById("final-message");
 
 let teams = [];
 let currentQuestion = 0;
@@ -120,10 +119,10 @@ teamForm.addEventListener("submit", (event) => {
   teamNameInput.value = "";
 });
 
-startBtn.addEventListener("click", () => {
-  teamSection.classList.add("hidden");
-  quizSection.classList.remove("hidden");
-  renderQuestion();
+teamsAnswers.addEventListener("click", (event) => {
+  const btn = event.target.closest(".option-btn");
+  if (!btn || !teamsAnswers.contains(btn) || questionLocked) return;
+  handleTeamChoice(btn.dataset.team, Number(btn.dataset.choice));
 });
 
 nextBtn.addEventListener("click", () => {
@@ -137,10 +136,16 @@ nextBtn.addEventListener("click", () => {
 });
 
 function addTeam(name) {
-  if (teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) return;
+  if (teams.length > 0) return;
   teams.push({ name, score: 0 });
   renderTeams();
-  startBtn.disabled = teams.length === 0;
+  startQuiz();
+}
+
+function startQuiz() {
+  teamSection.classList.add("hidden");
+  quizSection.classList.remove("hidden");
+  renderQuestion();
 }
 
 function renderTeams() {
@@ -210,7 +215,6 @@ function renderTeamAnswerPanels() {
       btn.dataset.team = team.name;
       btn.dataset.choice = idx;
       btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt}</span><span class="ghost">🦌</span>`;
-      btn.addEventListener("click", handleTeamChoice);
 
       if (answers[team.name] === idx) {
         btn.classList.add("selected");
@@ -224,10 +228,7 @@ function renderTeamAnswerPanels() {
   });
 }
 
-function handleTeamChoice(event) {
-  if (questionLocked) return;
-  const teamName = event.currentTarget.dataset.team;
-  const choice = Number(event.currentTarget.dataset.choice);
+function handleTeamChoice(teamName, choice) {
   answers[teamName] = choice;
   updateSelections();
   if (Object.keys(answers).length === teams.length) {
@@ -236,7 +237,7 @@ function handleTeamChoice(event) {
 }
 
 function updateSelections() {
-  document.querySelectorAll(".team-controls").forEach((group) => {
+  teamsAnswers.querySelectorAll(".team-controls").forEach((group) => {
     group.querySelectorAll(".option-btn").forEach((btn) => {
       const teamName = btn.dataset.team;
       const selected = answers[teamName];
@@ -276,7 +277,7 @@ function revealExplanation() {
 
   explanationBox.textContent = explanation;
   explanationBox.classList.remove("hidden");
-  nextBtn.textContent = currentQuestion === questions.length - 1 ? "See the podium" : "Next question";
+  nextBtn.textContent = currentQuestion === questions.length - 1 ? "See your results" : "Next question";
   nextBtn.disabled = false;
 }
 
@@ -289,23 +290,18 @@ function showWinners() {
   quizSection.classList.add("hidden");
   winnersSection.classList.remove("hidden");
 
-  const standings = [...teams].sort((a, b) => b.score - a.score);
-  const medals = ["🥇", "🥈", "🥉"];
+  const [team] = teams;
+  const { score } = team;
+  const total = questions.length;
+  const remaining = total - score;
 
-  podium.innerHTML = "";
-  standings.slice(0, 3).forEach((team, idx) => {
-    const spot = document.createElement("div");
-    spot.className = "podium__spot";
-    const place = ["1st", "2nd", "3rd"][idx];
-    spot.innerHTML = `<div class="medal">${medals[idx] ?? "🎁"}</div><h3>${place} place</h3><p>${team.name}</p><p>${team.score} point${team.score === 1 ? "" : "s"}</p>`;
-    podium.appendChild(spot);
-  });
+  finalScore.textContent = `${team.name} earned ${score} point${score === 1 ? "" : "s"} out of ${total}.`;
 
-  scoreboard.innerHTML = "";
-  standings.forEach((team, idx) => {
-    const row = document.createElement("div");
-    row.className = "score-row";
-    row.innerHTML = `<span>${idx + 1}. ${team.name}</span><span>${team.score} / ${questions.length}</span>`;
-    scoreboard.appendChild(row);
-  });
+  if (remaining === 0) {
+    finalMessage.textContent = "Perfect score! Your sleigh is locked down tighter than Santa's cookie jar.";
+  } else if (score >= Math.ceil(total * 0.7)) {
+    finalMessage.textContent = "Great job! A few more quick checks and the North Pole will be ironclad.";
+  } else {
+    finalMessage.textContent = "Thanks for playing!";
+  }
 }

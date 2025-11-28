@@ -4,6 +4,7 @@
   --snow: #f7fbff;
   --candy: #e43f5a;
   --gold: #f7c948;
+  --frost: rgba(255, 255, 255, 0.65);
   --ink: #1b1b1f;
   --muted: #5d6470;
   --card: #ffffff;
@@ -19,9 +20,32 @@ body {
   margin: 0;
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
   background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8), rgba(240, 248, 255, 0.7)),
-    linear-gradient(135deg, #f0f4ff 0%, #fefefe 50%, #f6fbff 100%);
+    linear-gradient(135deg, #061623 0%, #0f3a2e 35%, #0b4d46 60%, #122a45 100%);
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.snowfall {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(2px 2px at 12px 24px, var(--frost), transparent),
+    radial-gradient(2px 2px at 56px 120px, var(--frost), transparent),
+    radial-gradient(3px 3px at 120px 90px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 220px 24px, rgba(255, 255, 255, 0.75), transparent);
+  background-size: 240px 240px;
+  animation: snow 16s linear infinite;
+  opacity: 0.7;
+  z-index: 0;
+  will-change: background-position;
+}
+
+.snowfall--slow {
+  animation-duration: 24s;
+  opacity: 0.5;
+  filter: blur(0.3px);
 }
 
 header.hero {
@@ -30,9 +54,12 @@ header.hero {
   gap: 24px;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(120deg, var(--ivy) 0%, var(--pine) 100%);
+  background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.06), transparent 50%),
+    linear-gradient(120deg, #0f4d3b 0%, #0b3f33 50%, #0c2c4a 100%);
   color: #fff;
   border-bottom: 6px solid var(--gold);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero__content h1 {
@@ -76,14 +103,17 @@ main {
   max-width: 1000px;
   margin: -32px auto 80px;
   padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
-  background: var(--card);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.95));
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
   margin-bottom: 28px;
 }
 
@@ -360,48 +390,26 @@ button:not(:disabled):active {
   width: 0%;
 }
 
-.podium {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+.result-card {
   margin-top: 16px;
-}
-
-.podium__spot {
-  border: 2px dashed var(--border);
+  padding: 18px;
   border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-  background: #f8fafc;
+  border: 1px solid rgba(25, 107, 67, 0.2);
+  background: linear-gradient(135deg, rgba(25, 107, 67, 0.08), rgba(247, 201, 72, 0.12));
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.08);
 }
 
-.podium__spot h3 {
-  margin: 8px 0 4px;
+.result-score {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ivy);
 }
 
-.medal {
-  font-size: 28px;
-}
-
-.scoreboard {
-  margin-top: 16px;
-  display: grid;
-  gap: 8px;
-}
-
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  background: #fdf2f8;
-  border: 1px solid #fbcfe8;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 700;
-}
-
-.score-row:nth-child(odd) {
-  background: #f8fafc;
-  border-color: var(--border);
+.result-message {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 footer {
@@ -420,6 +428,30 @@ footer {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@keyframes snow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowfall,
+  .snowfall--slow {
+    animation: none;
+    opacity: 0.25;
+  }
+
+  .team-form button,
+  .nav-row button,
+  .primary,
+  .option-btn {
+    transition: none;
+  }
 }
 
 @media (max-width: 720px) {
