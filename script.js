@@ -89,7 +89,6 @@ const questions = [
 const teamForm = document.getElementById("team-form");
 const teamNameInput = document.getElementById("team-name");
 const teamList = document.getElementById("team-list");
-const startBtn = document.getElementById("start-btn");
 
 const quizSection = document.getElementById("quiz-section");
 const teamSection = document.getElementById("team-section");
@@ -120,12 +119,6 @@ teamForm.addEventListener("submit", (event) => {
   teamNameInput.value = "";
 });
 
-startBtn.addEventListener("click", () => {
-  teamSection.classList.add("hidden");
-  quizSection.classList.remove("hidden");
-  renderQuestion();
-});
-
 nextBtn.addEventListener("click", () => {
   if (currentQuestion < questions.length - 1) {
     currentQuestion += 1;
@@ -137,10 +130,16 @@ nextBtn.addEventListener("click", () => {
 });
 
 function addTeam(name) {
-  if (teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) return;
+  if (teams.length > 0) return;
   teams.push({ name, score: 0 });
   renderTeams();
-  startBtn.disabled = teams.length === 0;
+  startQuiz();
+}
+
+function startQuiz() {
+  teamSection.classList.add("hidden");
+  quizSection.classList.remove("hidden");
+  renderQuestion();
 }
 
 function renderTeams() {
