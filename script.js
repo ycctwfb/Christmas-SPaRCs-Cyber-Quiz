@@ -101,8 +101,8 @@ const explanationBox = document.getElementById("explanation");
 const nextBtn = document.getElementById("next-btn");
 const progressCount = document.getElementById("progress-count");
 const progressBarFill = document.getElementById("progress-bar-fill");
-const podium = document.getElementById("podium");
-const scoreboard = document.getElementById("scoreboard");
+const finalScore = document.getElementById("final-score");
+const finalMessage = document.getElementById("final-message");
 
 let teams = [];
 let currentQuestion = 0;
@@ -275,7 +275,7 @@ function revealExplanation() {
 
   explanationBox.textContent = explanation;
   explanationBox.classList.remove("hidden");
-  nextBtn.textContent = currentQuestion === questions.length - 1 ? "See the podium" : "Next question";
+  nextBtn.textContent = currentQuestion === questions.length - 1 ? "See your results" : "Next question";
   nextBtn.disabled = false;
 }
 
@@ -288,23 +288,18 @@ function showWinners() {
   quizSection.classList.add("hidden");
   winnersSection.classList.remove("hidden");
 
-  const standings = [...teams].sort((a, b) => b.score - a.score);
-  const medals = ["🥇", "🥈", "🥉"];
+  const [team] = teams;
+  const { score } = team;
+  const total = questions.length;
+  const remaining = total - score;
 
-  podium.innerHTML = "";
-  standings.slice(0, 3).forEach((team, idx) => {
-    const spot = document.createElement("div");
-    spot.className = "podium__spot";
-    const place = ["1st", "2nd", "3rd"][idx];
-    spot.innerHTML = `<div class="medal">${medals[idx] ?? "🎁"}</div><h3>${place} place</h3><p>${team.name}</p><p>${team.score} point${team.score === 1 ? "" : "s"}</p>`;
-    podium.appendChild(spot);
-  });
+  finalScore.textContent = `${team.name} earned ${score} point${score === 1 ? "" : "s"} out of ${total}.`;
 
-  scoreboard.innerHTML = "";
-  standings.forEach((team, idx) => {
-    const row = document.createElement("div");
-    row.className = "score-row";
-    row.innerHTML = `<span>${idx + 1}. ${team.name}</span><span>${team.score} / ${questions.length}</span>`;
-    scoreboard.appendChild(row);
-  });
+  if (remaining === 0) {
+    finalMessage.textContent = "Perfect score! Your sleigh is locked down tighter than Santa's cookie jar.";
+  } else if (score >= Math.ceil(total * 0.7)) {
+    finalMessage.textContent = "Great job! A few more quick checks and the North Pole will be ironclad.";
+  } else {
+    finalMessage.textContent = "Thanks for playing! Brush up on those cyber tips to keep the workshop merry and secure.";
+  }
 }

@@ -360,48 +360,26 @@ button:not(:disabled):active {
   width: 0%;
 }
 
-.podium {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+.result-card {
   margin-top: 16px;
-}
-
-.podium__spot {
-  border: 2px dashed var(--border);
+  padding: 18px;
   border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-  background: #f8fafc;
+  border: 1px solid rgba(25, 107, 67, 0.2);
+  background: linear-gradient(135deg, rgba(25, 107, 67, 0.08), rgba(247, 201, 72, 0.12));
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.08);
 }
 
-.podium__spot h3 {
-  margin: 8px 0 4px;
+.result-score {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ivy);
 }
 
-.medal {
-  font-size: 28px;
-}
-
-.scoreboard {
-  margin-top: 16px;
-  display: grid;
-  gap: 8px;
-}
-
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  background: #fdf2f8;
-  border: 1px solid #fbcfe8;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 700;
-}
-
-.score-row:nth-child(odd) {
-  background: #f8fafc;
-  border-color: var(--border);
+.result-message {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 footer {
