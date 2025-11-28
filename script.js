@@ -119,6 +119,12 @@ teamForm.addEventListener("submit", (event) => {
   teamNameInput.value = "";
 });
 
+teamsAnswers.addEventListener("click", (event) => {
+  const btn = event.target.closest(".option-btn");
+  if (!btn || !teamsAnswers.contains(btn) || questionLocked) return;
+  handleTeamChoice(btn.dataset.team, Number(btn.dataset.choice));
+});
+
 nextBtn.addEventListener("click", () => {
   if (currentQuestion < questions.length - 1) {
     currentQuestion += 1;
@@ -209,7 +215,6 @@ function renderTeamAnswerPanels() {
       btn.dataset.team = team.name;
       btn.dataset.choice = idx;
       btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt}</span><span class="ghost">🦌</span>`;
-      btn.addEventListener("click", handleTeamChoice);
 
       if (answers[team.name] === idx) {
         btn.classList.add("selected");
@@ -223,10 +228,7 @@ function renderTeamAnswerPanels() {
   });
 }
 
-function handleTeamChoice(event) {
-  if (questionLocked) return;
-  const teamName = event.currentTarget.dataset.team;
-  const choice = Number(event.currentTarget.dataset.choice);
+function handleTeamChoice(teamName, choice) {
   answers[teamName] = choice;
   updateSelections();
   if (Object.keys(answers).length === teams.length) {
@@ -235,7 +237,7 @@ function handleTeamChoice(event) {
 }
 
 function updateSelections() {
-  document.querySelectorAll(".team-controls").forEach((group) => {
+  teamsAnswers.querySelectorAll(".team-controls").forEach((group) => {
     group.querySelectorAll(".option-btn").forEach((btn) => {
       const teamName = btn.dataset.team;
       const selected = answers[teamName];

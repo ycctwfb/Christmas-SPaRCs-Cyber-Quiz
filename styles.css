@@ -31,23 +31,21 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(2px 2px at 20px 30px, var(--frost), transparent),
-    radial-gradient(2px 2px at 80px 120px, var(--frost), transparent),
-    radial-gradient(3px 3px at 150px 90px, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 250px 10px, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(2px 2px at 320px 180px, var(--frost), transparent),
-    radial-gradient(2px 2px at 500px 40px, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(3px 3px at 640px 160px, rgba(255, 255, 255, 0.9), transparent);
-  background-size: 260px 260px;
-  animation: snow 18s linear infinite;
-  opacity: 0.8;
+  background-image: radial-gradient(2px 2px at 12px 24px, var(--frost), transparent),
+    radial-gradient(2px 2px at 56px 120px, var(--frost), transparent),
+    radial-gradient(3px 3px at 120px 90px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 220px 24px, rgba(255, 255, 255, 0.75), transparent);
+  background-size: 240px 240px;
+  animation: snow 16s linear infinite;
+  opacity: 0.7;
   z-index: 0;
+  will-change: background-position;
 }
 
 .snowfall--slow {
-  animation-duration: 28s;
-  opacity: 0.6;
-  filter: blur(0.4px);
+  animation-duration: 24s;
+  opacity: 0.5;
+  filter: blur(0.3px);
 }
 
 header.hero {
@@ -115,7 +113,6 @@ main {
   padding: 24px;
   box-shadow: var(--shadow);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
   position: relative;
   margin-bottom: 28px;
 }
@@ -438,7 +435,22 @@ footer {
     background-position: 0 0;
   }
   to {
-    background-position: 0 260px;
+    background-position: 0 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowfall,
+  .snowfall--slow {
+    animation: none;
+    opacity: 0.25;
+  }
+
+  .team-form button,
+  .nav-row button,
+  .primary,
+  .option-btn {
+    transition: none;
   }
 }
 
