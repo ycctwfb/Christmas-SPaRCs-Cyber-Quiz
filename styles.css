@@ -4,6 +4,7 @@
   --snow: #f7fbff;
   --candy: #e43f5a;
   --gold: #f7c948;
+  --frost: rgba(255, 255, 255, 0.65);
   --ink: #1b1b1f;
   --muted: #5d6470;
   --card: #ffffff;
@@ -19,9 +20,45 @@ body {
   margin: 0;
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
   background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8), rgba(240, 248, 255, 0.7)),
-    linear-gradient(135deg, #f0f4ff 0%, #fefefe 50%, #f6fbff 100%);
+    linear-gradient(135deg, #061623 0%, #0f3a2e 35%, #0b4d46 60%, #122a45 100%);
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.snowfall {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(2px 2px at 20px 30px, var(--frost), transparent),
+    radial-gradient(2px 2px at 80px 120px, var(--frost), transparent),
+    radial-gradient(3px 3px at 150px 90px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 250px 10px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 320px 180px, var(--frost), transparent),
+    radial-gradient(2px 2px at 500px 40px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(3px 3px at 640px 160px, rgba(255, 255, 255, 0.9), transparent);
+  background-size: 260px 260px;
+  animation: snow 18s linear infinite;
+  opacity: 0.8;
+  z-index: 0;
+}
+
+.snowfall--slow {
+  animation-duration: 28s;
+  opacity: 0.6;
+  filter: blur(0.4px);
+}
+
+.reindeer-flight {
+  position: fixed;
+  top: 48px;
+  left: -220px;
+  font-size: 32px;
+  animation: fly-across 22s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 header.hero {
@@ -30,9 +67,12 @@ header.hero {
   gap: 24px;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(120deg, var(--ivy) 0%, var(--pine) 100%);
+  background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.06), transparent 50%),
+    linear-gradient(120deg, #0f4d3b 0%, #0b3f33 50%, #0c2c4a 100%);
   color: #fff;
   border-bottom: 6px solid var(--gold);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero__content h1 {
@@ -76,14 +116,18 @@ main {
   max-width: 1000px;
   margin: -32px auto 80px;
   padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
-  background: var(--card);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.95));
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+  position: relative;
   margin-bottom: 28px;
 }
 
@@ -398,6 +442,30 @@ footer {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@keyframes snow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 260px;
+  }
+}
+
+@keyframes fly-across {
+  0% {
+    transform: translateX(-10%);
+  }
+  40% {
+    transform: translateX(40%) translateY(-6px);
+  }
+  70% {
+    transform: translateX(75%) translateY(6px);
+  }
+  100% {
+    transform: translateX(120%);
+  }
 }
 
 @media (max-width: 720px) {

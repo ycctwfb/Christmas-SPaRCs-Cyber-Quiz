@@ -300,6 +300,6 @@ function showWinners() {
   } else if (score >= Math.ceil(total * 0.7)) {
     finalMessage.textContent = "Great job! A few more quick checks and the North Pole will be ironclad.";
   } else {
-    finalMessage.textContent = "Thanks for playing! Brush up on those cyber tips to keep the workshop merry and secure.";
+    finalMessage.textContent = "Thanks for playing!";
   }
 }
