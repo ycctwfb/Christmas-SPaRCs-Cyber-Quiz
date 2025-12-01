@@ -83,17 +83,21 @@ header.hero {
   padding: 0 18px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
   position: relative;
   z-index: 2;
 }
+
 
 .sleigh-banner__lead {
   display: inline-flex;
 }
 
 .sleigh-banner__santa {
-  height: 48px;
+  height: clamp(42px, 6vw, 64px);
+  max-width: min(36vw, 240px);
   width: auto;
   display: block;
 }
@@ -107,9 +111,10 @@ header.hero {
 }
 
 .sleigh-banner__reindeer img {
-  height: 42px;
+  height: clamp(32px, 5vw, 52px);
   width: auto;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.14));
+  object-fit: contain;
 }
 
 .hero__content h1 {
