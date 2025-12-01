@@ -103,6 +103,7 @@ const progressCount = document.getElementById("progress-count");
 const progressBarFill = document.getElementById("progress-bar-fill");
 const finalScore = document.getElementById("final-score");
 const finalMessage = document.getElementById("final-message");
+const reindeerLine = document.getElementById("reindeer-line");
 
 let teams = [];
 let currentQuestion = 0;
@@ -110,6 +111,8 @@ let answers = {};
 let questionLocked = false;
 
 const letters = ["A", "B", "C", "D"];
+
+renderReindeer(1);
 
 teamForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -158,6 +161,18 @@ function renderTeams() {
   });
 }
 
+function renderReindeer(count) {
+  if (!reindeerLine) return;
+  reindeerLine.innerHTML = "";
+  const herdSize = Math.max(1, count);
+  for (let i = 0; i < herdSize; i += 1) {
+    const deer = document.createElement("img");
+    deer.src = "assets/reindeer.png";
+    deer.alt = "Reindeer guiding the sleigh";
+    reindeerLine.appendChild(deer);
+  }
+}
+
 function resetQuestionState() {
   answers = {};
   questionLocked = false;
@@ -171,6 +186,7 @@ function renderQuestion() {
   progressCount.textContent = `${currentQuestion + 1} / ${questions.length}`;
   const progress = ((currentQuestion + 1) / questions.length) * 100;
   progressBarFill.style.width = `${progress}%`;
+  renderReindeer(currentQuestion + 1);
 
   questionTitle.textContent = `Question ${currentQuestion + 1}`;
   questionText.textContent = text;
