@@ -27,6 +27,20 @@ body {
   overflow-x: hidden;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('assets/ChatGPT Image Dec 1, 2025, 10_38_03 AM.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+
 .snowfall {
   position: fixed;
   inset: 0;
@@ -38,7 +52,7 @@ body {
   background-size: 240px 240px;
   animation: snow 16s linear infinite;
   opacity: 0.7;
-  z-index: 0;
+  z-index: 1;
   will-change: background-position;
 }
 
@@ -59,6 +73,7 @@ header.hero {
   color: #fff;
   border-bottom: 6px solid var(--gold);
   position: relative;
+  z-index: 2;
   overflow: hidden;
 }
 
@@ -104,7 +119,7 @@ main {
   margin: -32px auto 80px;
   padding: 0 24px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .card {
